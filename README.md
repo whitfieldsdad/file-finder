@@ -55,6 +55,23 @@ To enable it, use the `--follow-symlinks` flag:
 poetry run find ~ . --follow-symlinks
 ```
 
+### Searching for files with a minimum or maximum file size
+
+To search for files with a minimum file size:
+
+```bash
+
+poetry run find ~ --min-size=1KB
+```
+
+To search for files with a maximum file size:
+
+```bash
+poetry run find ~ --max-size=1MiB
+```
+
+> ℹ️ You can use either binary or decimal notation!
+
 ### Searching for files matching a set of YARA rules
 
 As an example, let's search for all PE files on the system, including files located on mounted filesystems while following symbolic links and save the results to a file:

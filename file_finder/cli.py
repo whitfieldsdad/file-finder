@@ -1,13 +1,15 @@
 import os
 import click
 from typing import List, Optional
-from file_finder.search import FOLLOW_MOUNTS, FOLLOW_SYMLINKS
-from file_finder.find import Find
+from file_finder.search import Search, FOLLOW_MOUNTS, FOLLOW_SYMLINKS
+
+import file_finder.ux
 
 import click
 import logging
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def get_default_roots() -> List[str]:
@@ -21,23 +23,29 @@ def get_default_roots() -> List[str]:
 @click.option('--follow-symlinks/--no-follow-symlinks', is_flag=True, default=FOLLOW_SYMLINKS, show_default=True)
 @click.option('--exclude', 'excluded_directories', multiple=True)
 @click.option('--yara-rules', 'yara_rule_paths', multiple=True)
+@click.option('--min-file-size', type=file_finder.ux.parse_human_readable_number_of_bytes)
+@click.option('--max-file-size', type=file_finder.ux.parse_human_readable_number_of_bytes)
 def find_paths(
         roots: List[str],
         output_file: Optional[str],
         follow_mounts: bool, follow_symlinks: bool,
         excluded_directories: List[str],
-        yara_rule_paths: List[str]):
+        yara_rule_paths: List[str],
+        min_file_size: Optional[str],
+        max_file_size: Optional[str]):
     """
     Search for files.
     """
     roots = roots or get_default_roots()
 
-    search = Find(
+    search = Search(
         roots=roots,
         follow_mounts=follow_mounts,
         follow_symlinks=follow_symlinks,
         excluded_directories=excluded_directories,
         yara_rule_paths=yara_rule_paths,
+        min_file_size=min_file_size,
+        max_file_size=max_file_size,
     )
     if output_file:
         with open(output_file, 'w') as file:
