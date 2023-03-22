@@ -13,6 +13,12 @@ The files that you're looking for can be surprisingly hard to find, so, I'm tryi
 make install
 ```
 
+To run the unit tests:
+
+```bash
+make test
+```
+
 ## Building executables
 
 Cross-platform compilation is not supported, but yuou can build executables for your current platform:
@@ -55,6 +61,23 @@ To enable it, use the `--follow-symlinks` flag:
 poetry run find ~ . --follow-symlinks
 ```
 
+### Searching for files with a specific name
+
+To search for files with a specific name:
+
+```bash
+
+poetry run find ~ --name=README.md
+```
+
+### Searching for files matching a particular filename pattern
+
+As an example, let's search for all YARA rules on the system, including files located on mounted filesystems without following symbolic links:
+
+```bash
+poetry run find / --min-file-size "1KiB" --max-file-size "100KiB" --filename-pattern '*.yar' --follow-mounts --no-follow-symlinks
+```
+
 ### Searching for files with a minimum or maximum file size
 
 To search for files with a minimum file size:
@@ -86,4 +109,8 @@ To count the number of matching files, pipe the output to `wc` (**W**ord **C**ou
 
 ```bash
 poetry run find ~ | wc -l
+```
+
+```
+
 ```
