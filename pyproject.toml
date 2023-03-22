@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "file-finder"
-version = "0.1.0"
+version = "0.2.0"
 description = "A Python module for finding files"
 authors = ["Tyler Fisher <tylerfisher@tylerfisher.ca>"]
 readme = "README.md"
@@ -9,6 +9,8 @@ packages = [{include = "file_finder"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 click = "^8.1.3"
+yara-python = "^4.2.3"
+tqdm = "^4.65.0"
 
 [tool.poetry.scripts]
 file-finder = "file_finder.cli:main"

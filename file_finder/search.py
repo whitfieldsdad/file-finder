@@ -18,6 +18,10 @@ class Search:
     follow_symlinks: bool = FOLLOW_SYMLINKS
     excluded_directories: Optional[List[str]] = None
 
+    @property
+    def total(self) -> int:
+        return self.count_matching_files()
+
     def walk(self) -> Iterator[str]:
         excluded_directories = self.excluded_directories
         follow_mounts = self.follow_mounts
@@ -31,6 +35,12 @@ class Search:
                 follow_symlinks=follow_symlinks,
             )
 
+    def iter_matching_files(self) -> Iterator[str]:
+        yield from self.walk()
+
+    def count_matching_files(self) -> int:
+        return sum(1 for _ in self)
+
     def __iter__(self):
         yield from self.walk()
 
@@ -40,6 +50,10 @@ def walk(
         excluded_directories: Optional[Iterable[str]] = None,
         follow_symlinks: bool = FOLLOW_SYMLINKS,
         follow_mounts: bool = FOLLOW_MOUNTS) -> Iterator[str]:
+
+    if not os.path.isdir(path):
+        yield path
+        return
 
     for entry in os.scandir(path):
         if entry.is_dir(follow_symlinks=follow_symlinks):
@@ -66,7 +80,6 @@ def walk(
 
 
 def in_directory(path: str, directory: str) -> bool:
-    logger.info(f"Checking if {path} is in {directory}")
     path = os.path.abspath(path)
     directory = os.path.abspath(directory)
     return os.path.commonpath([path, directory]) == directory
