@@ -110,7 +110,3 @@ To count the number of matching files, pipe the output to `wc` (**W**ord **C**ou
 ```bash
 poetry run find ~ | wc -l
 ```
-
-```
-
-```
