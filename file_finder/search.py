@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import sys
 from typing import Iterable, Iterator, List, Optional
 
+import errno
 import logging
 import os
 
@@ -19,7 +20,7 @@ class Search:
     excluded_directories: Optional[List[str]] = None
 
     @property
-    def total(self) -> int:
+    def total_results(self) -> int:
         return self.count_matching_files()
 
     def walk(self) -> Iterator[str]:
@@ -28,12 +29,14 @@ class Search:
         follow_symlinks = self.follow_symlinks
 
         for root in self.roots:
-            yield from walk(
-                path=root,
-                excluded_directories=excluded_directories,
-                follow_mounts=follow_mounts,
-                follow_symlinks=follow_symlinks,
-            )
+            if os.path.exists(root):
+                yield root
+                yield from walk(
+                    path=root,
+                    excluded_directories=excluded_directories,
+                    follow_mounts=follow_mounts,
+                    follow_symlinks=follow_symlinks,
+                )
 
     def iter_matching_files(self) -> Iterator[str]:
         yield from self.walk()
@@ -55,8 +58,18 @@ def walk(
         yield path
         return
 
-    for entry in os.scandir(path):
-        if entry.is_dir(follow_symlinks=follow_symlinks):
+    try:
+        entries = os.scandir(path)
+    except (OSError, PermissionError):
+        return
+
+    for entry in entries:
+        try:
+            is_dir = entry.is_dir(follow_symlinks=follow_symlinks)
+        except (OSError, PermissionError):
+            continue
+
+        if is_dir:
             yield entry.path
 
             # Skip mount points.

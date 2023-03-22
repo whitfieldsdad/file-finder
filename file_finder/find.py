@@ -36,7 +36,12 @@ class Find(Search):
             rules = read_yara_rules(self.yara_rule_paths)
             paths = iter_files_matching_any_yara_ruleset(paths, rules)
 
-        yield from paths
+        total = 0
+        for path in paths:
+            yield path
+            total += 1
+
+        logger.info(f"Found {total} matching files")
 
 
 def read_yara_rules(paths: List[str]) -> List[yara.Rules]:
